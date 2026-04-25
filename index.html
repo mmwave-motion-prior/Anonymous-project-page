@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="mmMoPrior learns a sim-to-real prior for zero-shot mmWave human motion reconstruction using discrete motion tokens and physics-informed heatmap augmentation. (Anonymous project page.)">
+  <meta name="keywords" content="Millimeter-wave Radar, Human Motion Reconstruction, Sim-to-Real, Discrete Representation, mmMoPrior">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Learning a Generalizable Sim-to-Real Prior for Zero-shot mmWave Human Motion Reconstruction (anonymous)</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="data:,">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="#top">
+        <span class="icon"><i class="fas fa-arrow-up"></i></span>
+        <span>Top</span>
+      </a>
+      <a class="navbar-item" href="#teaser">Teaser</a>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#approach">Approach</a>
+      <a class="navbar-item" href="#main-results">Main results</a>
+      <a class="navbar-item" href="#comparison-baselines">Baselines</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero" id="top">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <p class="is-size-6 publication-venue mb-2">Anonymous supplementary page &middot; Double-blind review</p>
+          <h1 class="title is-2 publication-title">Learning a Generalizable Sim-to-Real Prior for Zero-shot mmWave Human Motion Reconstruction</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous Author(s)</span>
+          </div>
+          <div class="is-size-6 publication-authors has-text-grey">
+            Affiliation omitted for double-blind review.
+          </div>
+
+          <div class="column has-text-centered mt-4">
+            <div class="publication-links">
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-light is-static" title="Omitted during double-blind review">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper (review)</span>
+                </span>
+              </span>
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-light is-static" title="Omitted during double-blind review">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv (after acceptance)</span>
+                </span>
+              </span>
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-light is-static" title="Optional; add after de-anonymization">
+                  <span class="icon"><i class="fab fa-youtube"></i></span>
+                  <span>Talk video (TBD)</span>
+                </span>
+              </span>
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-light is-static" title="Omitted during double-blind review">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code (after release)</span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section teaser-before-abstract" id="teaser">
+  <div class="container video-page-container">
+    <p class="subtitle has-text-centered mb-4">
+      <strong>TL;DR:</strong> <strong>mmMoPrior</strong> learns simulation priors from large-scale synthetic mmWave-motion pairs, enabling data-efficient real-world human motion reconstruction with minute-level calibration.
+    </p>
+    <div class="teaser-placeholder has-text-centered">
+      <p class="title is-5 mb-0">Teaser (placeholder)</p>
+    </div>
+    <h2 class="subtitle has-text-centered mt-4">
+      <strong>Left:</strong> The input multi-modal heatmaps, including MVDR views and range-Doppler.
+      <br>
+      <strong>Middle:</strong> The Ground Truth 3D human motion.
+      <br>
+      <strong>Right:</strong> The reconstructed 3D human motion with our method.
+    </h2>
+  </div>
+</section>
+
+<section class="section" id="abstract">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Millimeter-wave (mmWave) radar offers a privacy-preserving solution for human motion reconstruction in visually challenging environments, yet practical deployment is still constrained by the scarcity of paired radar-motion data. Existing real-world mmWave datasets are typically small, environment-specific, and expensive to collect, which limits generalization to new rooms, subjects, and sensing conditions. Although simulation provides scalable supervision, transferring simulated radar measurements to real deployments remains difficult due to multipath, clutter, hardware noise, and distance-dependent resolution degradation.
+            <br><br>
+            We propose <strong>mmMoPrior</strong>, a sim-to-real framework that learns transferable simulation priors for data-efficient real-world mmWave human motion reconstruction. mmMoPrior builds a large-scale corpus of simulated multi-modal mmWave heatmaps paired with AMASS-driven human motion and pretrains radar-measurement and motion representations from synthetic supervision. To reduce the residual measurement gap, we introduce physics-informed domain randomization in heatmap space and perform lightweight target-environment calibration with only a small amount of real data. Within this framework, we investigate both continuous regression and tokenized motion prediction, revealing a consistent robustness-precision trade-off: tokenized prediction provides stronger zero-shot robustness under severe deployment shift, whereas continuous regression benefits more from calibration and delivers the best final reconstruction accuracy.
+            <br><br>
+            Experiments across multiple real-world environments, distances, subjects, poses, and motion categories show that simulation priors can substantially reduce real-data requirements for practical mmWave human motion reconstruction, enabling effective adaptation to unseen environments with as few as 24 real sequences (about one minute of calibration data).
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-divider-top approach-section" id="approach">
+  <div class="container approach-wide-container">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h2 class="title is-3 has-text-centered">Approach</h2>
+        <figure class="approach-figure">
+          <img
+            class="approach-overview-image"
+            src="./static/images/overview.png"
+            alt="Overview of mmMoPrior"
+            loading="lazy">
+          <figcaption class="approach-caption">
+            <strong>Overview of mmMoPrior.</strong>
+            <strong>Stage I</strong> learns two transferable priors from large-scale simulation: (a) a multi-modal heatmap encoder via masked heatmap reconstruction, and (b) a joint-temporal motion tokenizer that discretizes SMPL-X motion sequences into a compact codebook.
+            <strong>Stage II</strong> reuses these pretrained components for heatmap-to-motion prediction: the heatmap encoder extracts measurement features, a temporal alignment and decoding module predicts motion latents in the tokenized space, and the frozen motion decoder reconstructs continuous body motion.
+            At deployment time, the pretrained model supports both zero-shot transfer and extreme few-shot target-environment calibration.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section video-results-section is-light section-divider-top" id="main-results">
+  <div class="container video-page-container">
+    <h2 class="title is-3 has-text-centered video-section-title">Main results</h2>
+
+    <h3 class="title is-4 has-text-centered mt-5 mb-4" id="vq">VQ-based mmMoPrior</h3>
+
+    <div id="carousel-vq-main" class="carousel results-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/main%20results/sequence_1801_walk_forward_turn_around/gt_pred_t00201.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Walk Forward &amp; Turn Around</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/main%20results/sequence_2009_inplace_march_inplace/gt_pred_t00117.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">March In Place</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/main%20results/sequence_InPlace__ArmRaiseSide45__Far/gt_pred_t00033.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Arm Raise Side 45 · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/main%20results/sequence_InPlace__JumpingJack__Near/gt_pred_t00014.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jumping Jack · Near</p>
+      </div>
+    </div>
+
+    <h3 class="title is-4 has-text-centered mt-6 mb-4" id="unseen-subjects">VQ-based Unseen subjects</h3>
+    <div id="carousel-vq-unseen" class="carousel results-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__bow__Near/gt_pred_t00003.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Bow · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__Crouch__Near/gt_pred_t00004.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Crouch · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__Punch__Mid/gt_pred_t00066.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Punch · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__ReverseFly__Far/gt_pred_t00036.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Reverse Fly · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__SitToStandChair__Near/gt_pred_t00000.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Sit To Stand Chair · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_InPlace__TurnLeft90Back__Far/gt_pred_t00008.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Turn Left 90 Back · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_Loco__SideWalkStep__Mid/gt_pred_t00074.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Side Walk Step · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/VQ/unseen%20subjects/sequence_Loco__WalkClockwise__Far/gt_pred_t00054.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Walk Clockwise · Far</p>
+      </div>
+    </div>
+
+    <h3 class="title is-4 has-text-centered mt-6 mb-4" id="reg">REG-based mmMoPrior</h3>
+    <div id="carousel-reg-main" class="carousel results-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_2009_inplace_march_inplace/gt_pred_t00117.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">March In Place</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_2057_inplace_jump_mid/gt_pred_t00105.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Inplace Jump · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_2101_inplace_jump_forward_back_mid/gt_pred_t00290.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jump Forward Back · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__ArmRaisedTorsoRotation__Mid/gt_pred_t00005.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Arm Raised Torso Rotation · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__ArmSwing__Far/gt_pred_t00058.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Arm Swing · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__Crouch__Mid/gt_pred_t00078.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Crouch · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__JumpRope__Mid/gt_pred_t00080.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jump Rope · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__MarchInPlace__Mid/gt_pred_t00018.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">March In Place · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__SitToStandChair__Near/gt_pred_t00072.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Sit To Stand Chair · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/main_results/sequence_InPlace__TorsoRotation__Near/gt_pred_t00006.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Torso Rotation · Near</p>
+      </div>
+    </div>
+
+    <h3 class="title is-4 has-text-centered mt-6 mb-4" id="reg-unseen-subjects">REG-based Unseen subjects</h3>
+    <div id="carousel-reg-unseen" class="carousel results-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__ArmRaisedTorsoRotation__Mid/gt_pred_t00010.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Arm Raised Torso Rotation · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__ArmSwing__Mid/gt_pred_t00002.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Arm Swing · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__ChestHeightSideWave__Mid/gt_pred_t00004.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Chest Height Side Wave · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__SitToStandChair__Near/gt_pred_t00006.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Sit To Stand Chair · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__TorsoRotation__Near/gt_pred_t00050.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Torso Rotation · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/results_wHeatmap/REG/unseen_subjects/sequence_InPlace__TurnLeft90Back__Far/gt_pred_t00008.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Turn Left 90 Back · Far</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section video-results-section section-divider-top" id="comparison-mmdiff">
+  <div class="container video-page-container ultrawide-page-container">
+    <h2 class="title is-3 has-text-centered video-section-title">Comparison with baseline</h2>
+
+    <h3 class="title is-4 has-text-centered mt-5 mb-4" id="mmdiff-main">Main results</h3>
+    <div id="carousel-mmdiff-main" class="carousel results-carousel ultrawide-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s1__sequence_InPlace__HighArmWave__Mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">High Arm Wave · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s1__sequence_InPlace__TableTennisShot__Mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Table Tennis Shot · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s2__sequence_InPlace__SitToStandChair__Near_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Sit To Stand Chair · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s3__sequence_InPlace__Kick__Near_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Kick · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s4__sequence_InPlace__Squat__Near_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Squat · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/s4__sequence_Loco__WalkCounterClockwise__Far_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Walk Counter Clockwise · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/sequence_2009_inplace_march_inplace_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">March In Place</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/sequence_2044_jog_clock_wise_mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jog Clock Wise · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/sequence_2055_inplace_jumping_jack_mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jumping Jack · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/main_results/sequence_2101_inplace_jump_forward_back_mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jump Forward Back · Mid</p>
+      </div>
+    </div>
+
+    <h3 class="title is-4 has-text-centered mt-6 mb-4" id="mmdiff-unseen-subjects">Unseen subjects</h3>
+    <div id="carousel-mmdiff-unseen" class="carousel results-carousel ultrawide-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s4__sequence_InPlace__bow__Near_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Bow · Near</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s4__sequence_InPlace__Crouch__Mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Crouch · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s4__sequence_InPlace__ReverseFly__Far_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Reverse Fly · Far</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s5__sequence_InPlace__Punch__Mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Punch · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s5__sequence_Loco__SideWalkStep__Mid_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Side Walk Step · Mid</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted loop playsinline preload="auto">
+          <source src="./static/videos/compare_mmDiff/unseen_subjects/s5__sequence_Loco__WalkClockwise__Far_front.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Walk Clockwise · Far</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section video-results-section section-divider-top" id="comparison-baselines">
+  <div class="container video-page-container">
+    <h2 class="title is-3 has-text-centered video-section-title">Comparison with all baselines</h2>
+
+    <div id="carousel-compare-all" class="carousel results-carousel">
+      <div class="item">
+        <video class="carousel-vid" controls muted playsinline preload="auto">
+          <source src="./static/videos/compare_all/s3__sequence_Loco__WalkForwardBackward__Mid_top.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">WalkForwardBackward</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted playsinline preload="auto">
+          <source src="./static/videos/compare_all/s4__sequence_Loco__SideWalkStep__Mid_top.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">SideWalkStep</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted playsinline preload="auto">
+          <source src="./static/videos/compare_all/s5__sequence_Loco__WalkClockwise__Far_top.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">WalkClockwise</p>
+      </div>
+      <div class="item">
+        <video class="carousel-vid" controls muted playsinline preload="auto">
+          <source src="./static/videos/compare_all/sequence_2044_jog_clock_wise_mid_top.mp4" type="video/mp4">
+        </video>
+        <p class="has-text-centered is-size-7 mt-1 video-clip-label">Jog Clock Wise</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">BibTeX (anonymous)</h2>
+    <pre><code>@article{anonymous2026mmMoPrior,
+  title   = {Learning a Generalizable Sim-to-Real Prior for Zero-shot mmWave Human Motion Reconstruction},
+  author  = {Anonymous},
+  journal = {Under review},
+  year    = {2026},
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p class="is-size-7">
+        Anonymous project page for peer review. Template derived from the
+        <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page (CC BY-SA 4.0).
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
