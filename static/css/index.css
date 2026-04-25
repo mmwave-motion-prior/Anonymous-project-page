@@ -161,6 +161,16 @@ body {
   background: #f7f8fa;
 }
 
+.teaser-demo-video {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1040px;
+  height: auto;
+  border-radius: 10px;
+  background: #0f0f10;
+}
+
 .teaser-before-abstract {
   padding-top: 0;
   padding-bottom: 2.5rem;

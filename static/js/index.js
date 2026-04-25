@@ -196,6 +196,12 @@ document.addEventListener('DOMContentLoaded', function () {
     restartTimer();
   }
 
+  var teaserVideo = document.querySelector('#teaser-demo-video');
+  if (teaserVideo) {
+    prepareVideo(teaserVideo);
+    safePlay(teaserVideo);
+  }
+
   // VQ: short clips, switch every 3.4 seconds.
   initSimpleVideoCarousel('#carousel-vq-main', {
     autoplayByTimer: true,
